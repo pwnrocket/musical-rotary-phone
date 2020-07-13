@@ -5,5 +5,4 @@ from .. import db
 
 @main.route('/',methods={'GET'})
 def index():
-    name = "Hello Fatima"
-    return name
+    return render_template('index.html')
