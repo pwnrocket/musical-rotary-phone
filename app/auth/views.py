@@ -8,6 +8,20 @@ from .forms import LoginForm, RegistrationForm
 
 
 
+
+@auth.before_app_request
+def before_request():
+    if current_user.is_authenticated:
+        current_user.ping()
+        if not current_user.confirmed \
+                and request.endpoint\
+                and request.blueprint != 'auth'\
+                and request.endpoint != 'static':
+            return redirect(url_for('auth.unconfirmed'))
+
+
+
+
 @auth.route("/login")
 def login():
     form = LoginForm()
@@ -21,6 +35,7 @@ def login():
             return redirect(next)
             flash('Invalid username or password')
     return render_template('auth/login.html',form=form)
+
 
 @auth.route('/logout')
 @login_required
@@ -57,13 +72,7 @@ def confirm(token):
         flash("The confirmation link is invalid or has expired")
     return redirect(url_for('main.index'))
 
-@auth.before_app_request
-def before_request():
-    if current_user.is_authenticated \
-            and not current_user.confirmed \
-            and request.blueprint != 'auth'\
-            and request.endpoint != 'static':
-        return redirect(url_for('auth.unconfirmed'))
+
 
 @auth.route('/unconfirmed')
 def unconfirmed():

@@ -1,8 +1,8 @@
-"""First after reseting  migration after roles and permissions
+"""Migration after profile codev2
 
-Revision ID: 3e2db70086a2
-Revises: 
-Create Date: 2020-07-13 15:31:50.861926
+Revision ID: 35592279b3fb
+Revises: 44f299102124
+Create Date: 2020-07-13 17:19:47.730699
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '3e2db70086a2'
-down_revision = None
+revision = '35592279b3fb'
+down_revision = '44f299102124'
 branch_labels = None
 depends_on = None
 
@@ -25,6 +25,11 @@ def upgrade():
     sa.Column('role_id', sa.Integer(), nullable=True),
     sa.Column('password_hash', sa.String(length=128), nullable=True),
     sa.Column('confirmed', sa.Boolean(), nullable=True),
+    sa.Column('name', sa.String(length=64), nullable=True),
+    sa.Column('location', sa.String(length=64), nullable=True),
+    sa.Column('about_me', sa.Text(), nullable=True),
+    sa.Column('member_since', sa.DateTime(), nullable=True),
+    sa.Column('last_seen', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['role_id'], ['roles.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
