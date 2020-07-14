@@ -17,7 +17,7 @@ develop-eggs
 .installed.cfg
 lib
 lib64
-__pycache__
+__pycache__/
 
 # Installer logs
 pip-log.txt
@@ -44,3 +44,6 @@ venv
 # Environment files
 .env
 .env-mysql
+
+# Editors
+.vscode/
