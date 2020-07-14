@@ -1,30 +1,39 @@
-from flask import render_template, session, redirect, url_for,flash
+from flask import request,render_template,abort ,session, redirect, url_for,flash,current_app
 from flask_login import login_required,current_user
 from .forms import EditProfileForm,EditProfileAdminForm,SearchForm
 from ..models import User,Role,Permission, Article
+from .scrape import get_story_dawn,get_story_express,get_story_thenews
 from .import main
 from .. import db
 from ..decorators import admin_required
 
-@main.route('/',methods={'GET'})
+
+@main.route('/',methods={'GET','POST'})
 def index():
     form = SearchForm()
     if current_user.can(Permission.USER) and form.validate_on_submit():
-        article = ""
-    return render_template('index.html')
+        if form.news_site.data == "Express":
+            get_story_express(form.news_url.data)
+        if form.news_site.data == "Dawn":
+            get_story_dawn(form.news_url.data)
+        if form.news_site.data == "TheNews":
+            get_story_thenews(form.news_url.data)
+        return redirect(url_for('.index'))
+    page = request.args.get('page',1,type=int)
+    pagination = Article.query.order_by(Article.timestamp.desc()).paginate(
+        page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+        error_out=False
+    )
+    articles = pagination.items
+    return render_template('index.html',form=form,articles=articles,pagination=pagination)
 
-
-@main.route('/user/<username>')
-def user(username):
-    user = User.query.filter_by(username=username).first_or_404()
-    return render_template('user.html',user=user)
 
 
 @main.route('/edit-profile',methods=['GET','POST'])
 @login_required
 def edit_profile():
     form = EditProfileForm()
-    if form.validate_on_submmit():
+    if form.validate_on_submit():
         current_user.name = form.name.data
         current_user.location = form.location.data
         current_user.about_me = form.about_me.data
@@ -64,3 +73,15 @@ def edit_profile_admin(id):
     form.location.data = user.location
     form.about_me.data = user.about_me
     return render_template('edit_profile.html',form=form,user=user)
+
+
+@main.route('/user/<username>')
+def user(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    page = request.args.get('page', 1, type=int)
+    pagination = user.articles.order_by(Article.timestamp.desc()).paginate(
+        page, per_page=current_app.config['FLASKY_POSTS_PER_PAGE'],
+        error_out=False)
+    articles = pagination.items
+    return render_template('user.html', user=user, articles=articles,
+                           pagination=pagination)

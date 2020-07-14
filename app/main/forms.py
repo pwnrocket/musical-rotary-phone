@@ -50,5 +50,5 @@ class EditProfileAdminForm(FlaskForm):
 NEWS_CHOICES = [('1','TheNews'),('2','Dawn'),('3','Express')]  
 
 class SearchForm(FlaskForm):
-    body = TextAreaField("Enter the URL for the article",validators=[DataRequired(),URL()])
+    news_url = TextAreaField("Enter the URL for the article",validators=[DataRequired()])
     news_site = SelectField("Select News Source",choices=NEWS_CHOICES)
