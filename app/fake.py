@@ -34,6 +34,7 @@ def articles(count=100):
                     title = fake.text(),
                     subject = "News",
                     published = "July 14, 2020",
-                    searched_by = 56)
+                    fake = True,
+                    searched_by = 10)
         db.session.add(a)
     db.session.commit()

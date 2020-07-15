@@ -11,13 +11,15 @@ from ..decorators import admin_required
 @main.route('/',methods={'GET','POST'})
 def index():
     form = SearchForm()
-    if current_user.can(Permission.USER) and form.validate_on_submit():
-        if form.news_site.data == "Express":
-            get_story_express(form.news_url.data)
-        if form.news_site.data == "Dawn":
-            get_story_dawn(form.news_url.data)
-        if form.news_site.data == "TheNews":
-            get_story_thenews(form.news_url.data)
+    if current_user.can(Permission.SEARCH) and form.validate_on_submit():
+        print(form.news_site.data)    
+        if form.news_site.data == "3":
+            get_story_express(form.news_url.data,current_user)
+        if form.news_site.data  == "2":
+            get_story_dawn(form.news_url.data,current_user)
+            print('This should be printed')
+        if form.news_site.data  == "1":
+            get_story_thenews(form.news_url.data,current_user)
         return redirect(url_for('.index'))
     page = request.args.get('page',1,type=int)
     pagination = Article.query.order_by(Article.timestamp.desc()).paginate(

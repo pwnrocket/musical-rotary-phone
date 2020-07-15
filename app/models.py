@@ -12,7 +12,7 @@ from . import db
 from . import login_manager
 
 class Permission:
-    USER = 1
+    SEARCH = 1
     COMMENT = 2
     ADMIN = 4
 
@@ -30,9 +30,28 @@ class Role(db.Model):
         return '<Role %r>' % self.name
 
     def __init__(self,**kwargs):
-        super(Role,self.__init__(**kwargs))
+        super(Role,self).__init__(**kwargs)
         if self.permissions is None:
             self.permissions = 0
+
+
+    @staticmethod
+    def insert_roles():
+        roles = {
+            'User' : [Permission.SEARCH,Permission.COMMENT],
+            'Administrator' : [Permission.SEARCH,Permission.COMMENT,Permission.ADMIN],
+        }
+        default_role = 'User'
+        for r in roles:
+            role = Role.query.filter_by(name=r).first()
+            if role is None:
+                role = Role(name=r)
+            role.reset_permissions()
+            for perm in roles[r]:
+                role.add_permission(perm)
+            role.default = (role.name == default_role)
+            db.session.add(role)
+        db.session.commit()
 
 
     def add_permission(self,perm):
@@ -51,24 +70,7 @@ class Role(db.Model):
         return self.permissions & perm == perm
 
 
-    @staticmethod
-    def insert_roles():
-        roles = {
-            'User' : [Permission.USER,Permission.COMMENT],
-            'Administrator' : [Permission.USER,Permission.COMMENT,Permission.ADMIN],
-        }
-
-        default_role = 'User'
-        for r in roles:
-            role = Role.query.filter_by(name=r).first()
-            if role is None:
-                role = Role(name=r)
-            role.reset_permissions()
-            for perm in roles[r]:
-                role.add_permission(perm)
-            role.default = (role.name == default_role)
-            db.session.add(role)
-        db.session.commit() 
+   
 
 
 class User(UserMixin,db.Model):
@@ -120,6 +122,7 @@ class User(UserMixin,db.Model):
 
     def can(self,perm):
         return self.role is not None and self.role.has_permission(perm)
+
 
     def is_administrator(self):
         return self.can(Permission.ADMIN)
@@ -209,7 +212,6 @@ login_manager.anonymous_user = AnonymousUser
 class Article(db.Model):
     __tablename__ = 'articles'
     id = db.Column(db.Integer,primary_key=True)
-    body = db.Column(db.Text)
     url = db.Column(db.Text())
     title = db.Column(db.Text())
     body = db.Column(db.Text())

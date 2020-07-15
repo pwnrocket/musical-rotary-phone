@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField,TextAreaField,BooleanField,SelectField
+from wtforms import StringField, SubmitField,TextAreaField,BooleanField,SelectField,Form
 from wtforms.validators import DataRequired,Length, Email,Regexp,URL
 import email_validator
 from wtforms import ValidationError
@@ -47,8 +47,9 @@ class EditProfileAdminForm(FlaskForm):
             raise ValidationError('Username already in use.')
 
 
-NEWS_CHOICES = [('1','TheNews'),('2','Dawn'),('3','Express')]  
 
 class SearchForm(FlaskForm):
-    news_url = TextAreaField("Enter the URL for the article",validators=[DataRequired()])
-    news_site = SelectField("Select News Source",choices=NEWS_CHOICES)
+    news_choices = [('1','TheNews'),('2','Dawn'),('3','Express')]  
+    news_url = StringField  ("Enter the URL for the article",validators=[DataRequired()])
+    news_site = SelectField("Select News Source",choices=news_choices)
+    submit = SubmitField('Submit')
