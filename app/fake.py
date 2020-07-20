@@ -28,13 +28,16 @@ def articles(count=100):
     fake = Faker()
     user_count = User.query.count()
     for i in range(count):
-        # u = User.query.offset(randint(0, user_count - 1)).first()
+        u = User.query.offset(randint(0, user_count - 1)).first()
         a = Article(body=fake.text(),
                     url = fake.text(),
                     title = fake.text(),
                     subject = "News",
                     published = "July 14, 2020",
                     fake = True,
-                    searched_by = 10)
+                    searched_by = u.id)
         db.session.add(a)
     db.session.commit()
+
+
+
