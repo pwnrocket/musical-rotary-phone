@@ -49,7 +49,7 @@ class EditProfileAdminForm(FlaskForm):
 
 
 class SearchForm(FlaskForm):
-    news_choices = [('1','TheNews'),('2','Dawn'),('3','Express')]  
-    news_url = StringField  ("Enter the URL for the article",validators=[DataRequired()])
+    news_choices = [('1','TheNews'),('2','Dawn'),('3','Express'),('4','Dependent'),('5','Text')]  
+    news_url = StringField  ("Enter the URL or Text for the article",validators=[DataRequired()])
     news_site = SelectField("Select News Source",choices=news_choices)
     submit = SubmitField('Submit')

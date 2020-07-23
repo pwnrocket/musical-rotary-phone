@@ -2,7 +2,7 @@ from flask import request,render_template,abort ,session, redirect, url_for,flas
 from flask_login import login_required,current_user
 from .forms import EditProfileForm,EditProfileAdminForm,SearchForm
 from ..models import User,Role,Permission, Article
-from .scrape import get_story_dawn,get_story_express,get_story_thenews
+from .scrape import get_story_dawn,get_story_express,get_story_thenews,get_story_dependent,get_text
 from .import main
 from .. import db
 from ..decorators import admin_required
@@ -12,7 +12,11 @@ from ..decorators import admin_required
 def index():
     form = SearchForm()
     if current_user.can(Permission.SEARCH) and form.validate_on_submit():
-        print(form.news_site.data)    
+        print(form.news_site.data)
+        if form.news_site.data == "5":
+            get_text(form.news_url.data,current_user)
+        if form.news_site.data == "4":
+            get_story_dependent(form.news_url.data,current_user)    
         if form.news_site.data == "3":
             get_story_express(form.news_url.data,current_user)
         if form.news_site.data  == "2":
